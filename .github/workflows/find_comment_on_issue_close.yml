@@ -26,7 +26,7 @@ jobs:
                 }
               }
             }
-          }' | jq '[.data.repository.issue.comments.edges[].node | select(.body | test("^\\d+[h].*$")) | (.body | sub("h"; "")) | tonumber] | add' >> "$GITHUB_OUTPUT")"
+          }' | jq '[.data.repository.issue.comments.edges[].node | select(.body | test("^\\d+[h].*$")) | (.body | sub("h"; "")) | tonumber] | add')"
           echo 'COUNTED_HOUR='$countedHour >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
