@@ -1,0 +1,25 @@
+
+name: find comment on issue close
+on:
+  issues:
+    types:
+    - closed
+
+jobs:
+  issue_commented:
+    # This job only runs for issue comments
+    name: Issue comment
+    if: ${{ !github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find existing comment
+        id: find_comment
+        uses: peter-evans/find-comment@v2.4.0
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body-regex: '^\d+[hH].*$'
+      - run: |
+          echo ${{ steps.find_comment.outputs.comment-id }}
+          echo ${{ steps.find_comment.outputs.comment-body }}
+          echo ${{ steps.find_comment.outputs.comment-author }}
+          echo ${{ steps.find_comment.outputs.comment-created-at }}
