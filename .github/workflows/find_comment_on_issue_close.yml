@@ -12,14 +12,27 @@ jobs:
     if: ${{ !github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
-      - name: Find existing comment
-        id: find_comment
-        uses: peter-evans/find-comment@v2.4.0
-        with:
-          issue-number: ${{ github.event.issue.number }}
-          body-regex: '^\d+[hH].*$'
       - run: |
-          echo ${{ toJSON(steps.find_comment.outputs) }}
-          echo ${{ steps.find_comment.outputs.comment-body }}
-          echo ${{ steps.find_comment.outputs.comment-author }}
-          echo ${{ steps.find_comment.outputs.comment-created-at }}
+        countedHour="$(gh api graphql -f query='
+        query{
+          repository(owner:""$OWNER"", name:""$REPO"") {
+            issue(number: ${{ github.event.issue.number }}) {
+              comments(first: 100) {
+                edges {
+                  node {
+                    body
+                  }
+                }
+              }
+            }
+          }
+        }' | jq '[.data.repository.issue.comments.edges[].node | select(.body | test(""^\\d+[h].*$"")) | (.body | sub(""h""; """")) | tonumber] | add' >> ""$GITHUB_OUTPUT"")"
+        echo 'COUNTED_HOUR='$countedHour >> $GITHUB_ENV
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        OWNER: ${{ github.repository_owner }}
+        REPO: ${{ github.event.repository.name }}
+      - run: |
+          echo "$COUNTED_HOUR is code time"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
