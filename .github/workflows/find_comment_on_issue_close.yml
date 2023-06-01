@@ -19,7 +19,7 @@ jobs:
           issue-number: ${{ github.event.issue.number }}
           body-regex: '^\d+[hH].*$'
       - run: |
-          echo ${{ steps.find_comment.outputs }}
+          echo ${{ toJSON(steps.find_comment.outputs) }}
           echo ${{ steps.find_comment.outputs.comment-body }}
           echo ${{ steps.find_comment.outputs.comment-author }}
           echo ${{ steps.find_comment.outputs.comment-created-at }}
