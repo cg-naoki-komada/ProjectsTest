@@ -13,25 +13,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-        countedHour="$(gh api graphql -f query='
-        query{
-          repository(owner:""$OWNER"", name:""$REPO"") {
-            issue(number: ${{ github.event.issue.number }}) {
-              comments(first: 100) {
-                edges {
-                  node {
-                    body
+          countedHour="$(gh api graphql -f query='
+          query{
+            repository(owner:"$OWNER", name:"$REPO") {
+              issue(number: ${{ github.event.issue.number }}) {
+                comments(first: 100) {
+                  edges {
+                    node {
+                      body
+                    }
                   }
                 }
               }
             }
-          }
-        }' | jq '[.data.repository.issue.comments.edges[].node | select(.body | test(""^\\d+[h].*$"")) | (.body | sub(""h""; """")) | tonumber] | add' >> ""$GITHUB_OUTPUT"")"
-        echo 'COUNTED_HOUR='$countedHour >> $GITHUB_ENV
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        OWNER: ${{ github.repository_owner }}
-        REPO: ${{ github.event.repository.name }}
+          }' | jq '[.data.repository.issue.comments.edges[].node | select(.body | test("^\\d+[h].*$")) | (.body | sub("h"; "")) | tonumber] | add' >> "$GITHUB_OUTPUT")"
+          echo 'COUNTED_HOUR='$countedHour >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
       - run: |
           echo "$COUNTED_HOUR is code time"
         env:
