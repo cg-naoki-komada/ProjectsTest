@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          countedHour="$(gh api graphql -f query='
-          query{
-            repository(owner:"$OWNER", name:"$REPO") {
+          countedHour="$(gh api graphql -F owner=$OWNER -F name=$REPO -f query='
+          query($name: String!, $owner: String!) {
+            repository(owner: $owner, name: $name) {
               issue(number: ${{ github.event.issue.number }}) {
                 comments(first: 100) {
                   edges {
