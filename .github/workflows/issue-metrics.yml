@@ -17,20 +17,25 @@ jobs:
       shell: bash
       run: |
         # Calculate the first day of the previous month
-        first_day=$(date -d "last month" +%Y-%m-01)
+        # first_day=$(date -d "last month" +%Y-%m-01)
+        # 今日から7日前
+        first_day=$(date -d "today -7 day" +%Y-%m-%d)
 
         # Calculate the last day of the previous month
-        last_day=$(date -d "$first_day +1 month -1 day" +%Y-%m-%d)
+        # last_day=$(date -d "$first_day +1 month -1 day" +%Y-%m-%d)
+        # 今日
+        last_day=$(date -d "today" +%Y-%m-%d)
 
         #Set an environment variable with the date range
         echo "$first_day..$last_day"
-        echo "last_month=$first_day..$last_day" >> "$GITHUB_ENV"
+        # echo "last_month=$first_day..$last_day" >> "$GITHUB_ENV"
+        echo "last_week=$first_day..$last_day" >> "$GITHUB_ENV"
 
     - name: Run issue-metrics tool
       uses: github/issue-metrics@v2
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SEARCH_QUERY: 'repo:cg-naoki-komada/ProjectsTest is:issue created:${{ env.last_month }} -reason:"not planned"'
+        SEARCH_QUERY: 'repo:cg-naoki-komada/ProjectsTest is:issue closed:${{ env.last_week }} -reason:"not planned"'
 
     - name: Create issue
       uses: peter-evans/create-issue-from-file@v4
